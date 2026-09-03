@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maxain Vehicle & Prop Spawner</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="spawner-container" class="spawner-container hidden">
+        <!-- Main Panel -->
+        <div class="spawner-panel">
+            
+            <!-- Header Bar -->
+            <header class="spawner-header">
+                <div class="brand-title">
+                    <div class="brand-logo">
+                        <i id="brand-icon" class="fas fa-car-side"></i>
+                    </div>
+                    <div class="brand-text">
+                        <h1>MAXAIN <span>SPAWNER</span></h1>
+                        <p class="subtitle">Spawn vehicles, ramps & objects</p>
+                    </div>
+                </div>
+
+                <!-- Mode Selector (Vehicles vs Props) -->
+                <div class="mode-selector">
+                    <button id="mode-vehicles-btn" class="mode-tab active">
+                        <i class="fas fa-car"></i> Vehicles
+                    </button>
+                    <button id="mode-props-btn" class="mode-tab">
+                        <i class="fas fa-cube"></i> Objects & Props
+                    </button>
+                </div>
+
+                <!-- Search Input -->
+                <div class="search-box">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="search-input" placeholder="Search name or model..." autocomplete="off">
+                    <button id="clear-search-btn" class="clear-btn hidden"><i class="fas fa-times"></i></button>
+                </div>
+
+                <!-- Close Button -->
+                <button id="close-btn" class="close-header-btn" title="Close Menu (ESC)">
+                    <i class="fas fa-times"></i>
+                </button>
+            </header>
+
+            <!-- Content Area: Sidebar + Grid -->
+            <div class="spawner-body">
+                
+                <!-- Category Sidebar -->
+                <aside class="sidebar">
+                    <h2 class="sidebar-title">CATEGORIES</h2>
+                    <ul id="category-list" class="category-list">
+                        <!-- Categories dynamically rendered -->
+                    </ul>
+
+                    <div class="sidebar-stats">
+                        <div class="stat-item">
+                            <span id="stat-count-label" class="stat-label">Total Items</span>
+                            <span id="total-vehicles-count" class="stat-value">0</span>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Vehicle / Prop Grid Container -->
+                <main class="grid-section">
+                    <div class="section-header">
+                        <h2 id="active-category-title">ALL VEHICLES</h2>
+                        <span id="showing-count" class="results-badge">Showing 0 items</span>
+                    </div>
+
+                    <div id="vehicle-grid" class="vehicle-grid">
+                        <!-- Vehicle / Prop cards dynamically populated -->
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="no-results" class="empty-state hidden">
+                        <i class="fas fa-search-minus"></i>
+                        <h3>No items found</h3>
+                        <p>Try searching for a different keyword or select another category.</p>
+                    </div>
+                </main>
+            </div>
+
+            <!-- Footer / Quick Action Bar -->
+            <footer class="spawner-footer">
+                <div class="footer-info">
+                    <span><i class="fas fa-keyboard"></i> Press <strong>ESC</strong> to exit menu</span>
+                </div>
+                <div class="footer-options">
+                    <button id="stop-3d-btn" class="btn-stop-preview hidden">
+                        <i class="fas fa-eye-slash"></i> Exit 3D Preview
+                    </button>
+
+                    <div id="prop-controls" class="prop-controls-bar hidden">
+                        <button id="delete-last-prop-btn" class="btn-prop-action">
+                            <i class="fas fa-undo"></i> Delete Last Prop
+                        </button>
+                        <button id="clear-props-btn" class="btn-prop-action danger">
+                            <i class="fas fa-trash-alt"></i> Clear All Props
+                        </button>
+                    </div>
+
+                    <div id="vehicle-controls">
+                        <label class="toggle-option">
+                            <input type="checkbox" id="spawn-inside-checkbox" checked>
+                            <span class="slider"></span>
+                            <span class="toggle-label">Auto-enter driver seat</span>
+                        </label>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Vehicle Color & 3D Preview Modal -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div class="modal-card">
+            <button id="close-modal-btn" class="modal-close-btn"><i class="fas fa-times"></i></button>
+            
+            <div class="modal-header">
+                <div class="modal-veh-image-wrapper" id="modal-image-preview-click">
+                    <img id="modal-veh-img" src="" alt="Vehicle Preview">
+                    <div class="img-zoom-hint"><i class="fas fa-search-plus"></i> View Image</div>
+                </div>
+                <div class="modal-veh-info">
+                    <span id="modal-veh-brand" class="modal-brand">BRAND</span>
+                    <h2 id="modal-veh-name" class="modal-name">Vehicle Name</h2>
+                    <span id="modal-veh-class" class="modal-class-badge">CLASS</span>
+                </div>
+            </div>
+
+            <div class="modal-body">
+                <h3>Select Color & Preview</h3>
+                <div class="color-picker-grid">
+                    <div class="color-group">
+                        <label>Primary Color</label>
+                        <div id="primary-colors" class="color-options">
+                            <!-- Preset colors generated by JS -->
+                        </div>
+                    </div>
+                    <div class="color-group">
+                        <label>Secondary Color</label>
+                        <div id="secondary-colors" class="color-options">
+                            <!-- Preset colors generated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer modal-actions-grid">
+                <button id="trigger-3d-preview-btn" class="btn-secondary">
+                    <i class="fas fa-cube"></i> 3D CAMERA PREVIEW
+                </button>
+                <button id="confirm-spawn-btn" class="btn-primary">
+                    <i class="fas fa-rocket"></i> SPAWN VEHICLE
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- High-Res Image Fullscreen Lightbox Modal -->
+    <div id="image-lightbox" class="lightbox-overlay hidden">
+        <div class="lightbox-content">
+            <button id="close-lightbox-btn" class="lightbox-close"><i class="fas fa-times"></i></button>
+            <img id="lightbox-img" src="" alt="Enlarged Image">
+            <h3 id="lightbox-title">Item Name</h3>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
