@@ -1,4 +1,5 @@
 cache/
 .replxx_history
-*.cfg
+server.cfg
+server.cfg.bkp
 *.bkp
