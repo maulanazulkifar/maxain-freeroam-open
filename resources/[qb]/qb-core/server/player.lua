@@ -550,21 +550,19 @@ local playertables = {
 function QBCore.Player.DeleteCharacter(source, citizenid)
     local license = QBCore.Functions.GetIdentifier(source, 'license')
     local result  = MySQL.scalar.await('SELECT license FROM players where citizenid = ?', { citizenid })
-    if license == result then
-        local query   = 'DELETE FROM %s WHERE citizenid = ?'
-        local queries = {}
+    local matchLicense = license and result and (license == result or license:gsub('license:', '') == result:gsub('license:', ''))
+    if matchLicense then
+        local query = 'DELETE FROM %s WHERE citizenid = ?'
         for i = 1, #playertables do
-            queries[i] = { query = query:format(playertables[i].table), values = { citizenid } }
+            pcall(MySQL.query.await, query:format(playertables[i].table), { citizenid })
         end
-        MySQL.transaction(queries, function(result2)
-            if result2 then
-                TriggerEvent('qb-log:server:CreateLog', 'joinleave', 'Character Deleted', 'red',
-                    '**' .. GetPlayerName(source) .. '** ' .. license .. ' deleted **' .. citizenid .. '**..')
-            end
-        end)
+        local playerName = GetPlayerName(source) or ("Player " .. tostring(source))
+        TriggerEvent('qb-log:server:CreateLog', 'joinleave', 'Character Deleted', 'red',
+            '**' .. playerName .. '** ' .. license .. ' deleted **' .. citizenid .. '**..')
     else
+        local playerName = GetPlayerName(source) or ("Player " .. tostring(source))
         DropPlayer(source, Lang:t('info.exploit_dropped'))
-        TriggerEvent('qb-log:server:CreateLog', 'anticheat', 'Anti-Cheat', 'white', GetPlayerName(source) .. ' Has Been Dropped For Character Deletion Exploit', true)
+        TriggerEvent('qb-log:server:CreateLog', 'anticheat', 'Anti-Cheat', 'white', playerName .. ' Has Been Dropped For Character Deletion Exploit', true)
     end
 end
 
