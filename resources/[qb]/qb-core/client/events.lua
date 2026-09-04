@@ -24,6 +24,9 @@ RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
         SetEntityHeading(ped, h)
     end
 
+    SetNuiFocus(false, false)
+    SetNuiFocusKeepInput(false)
+
     DoScreenFadeOut(0)
     FreezeEntityPosition(ped, true)
     Wait(500)
