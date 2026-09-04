@@ -320,14 +320,28 @@ end
 
 -- ─────────────────────────── login / logout ─────────────────────────────────
 
+local function IsPlayerLicenseMatching(source, dbLicense)
+    if not dbLicense or not source then return false end
+    local cleanDbLicense = tostring(dbLicense):gsub('^%w+:', '')
+    
+    local numIdentifiers = GetNumPlayerIdentifiers(source)
+    for i = 0, numIdentifiers - 1 do
+        local identifier = GetPlayerIdentifier(source, i)
+        if identifier then
+            local cleanIdentifier = tostring(identifier):gsub('^%w+:', '')
+            if cleanIdentifier == cleanDbLicense or identifier == dbLicense then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 function QBCore.Player.Login(source, citizenid, newData)
     if source and source ~= '' then
         if citizenid then
-            local license = QBCore.Functions.GetIdentifier(source, 'license')
             local PlayerData = MySQL.prepare.await('SELECT * FROM players where citizenid = ?', { citizenid })
-            local playerLicense = PlayerData and PlayerData.license or nil
-            local matchLicense = license and playerLicense and (license == playerLicense or license:gsub('license:', '') == playerLicense:gsub('license:', ''))
-            if PlayerData and matchLicense then
+            if PlayerData and IsPlayerLicenseMatching(source, PlayerData.license) then
                 decodePlayerFields(PlayerData)
                 QBCore.Player.CheckPlayerData(source, PlayerData)
             else
@@ -551,15 +565,14 @@ local playertables = {
 }
 
 function QBCore.Player.DeleteCharacter(source, citizenid)
-    local license = QBCore.Functions.GetIdentifier(source, 'license')
     local result  = MySQL.scalar.await('SELECT license FROM players where citizenid = ?', { citizenid })
-    local matchLicense = license and result and (license == result or license:gsub('license:', '') == result:gsub('license:', ''))
-    if matchLicense then
+    if IsPlayerLicenseMatching(source, result) then
         local query = 'DELETE FROM %s WHERE citizenid = ?'
         for i = 1, #playertables do
             pcall(MySQL.query.await, query:format(playertables[i].table), { citizenid })
         end
         local playerName = GetPlayerName(source) or ("Player " .. tostring(source))
+        local license = QBCore.Functions.GetIdentifier(source, 'license') or result or "Unknown"
         TriggerEvent('qb-log:server:CreateLog', 'joinleave', 'Character Deleted', 'red',
             '**' .. playerName .. '** ' .. license .. ' deleted **' .. citizenid .. '**..')
     else
