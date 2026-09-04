@@ -273,30 +273,32 @@ local function getAppearanceSettings()
         props[i] = getPropSettings(cache.ped, constants.PED_PROPS_IDS[i])
     end
 
+    local maxHeadShape = math.max(45, GetNumberOfPedDrawableVariations(cache.ped, 0) - 1)
+
     local headBlend = {
         shapeFirst = {
             min = 0,
-            max = 45
+            max = maxHeadShape
         },
         shapeSecond = {
             min = 0,
-            max = 45
+            max = maxHeadShape
         },
         shapeThird = {
             min = 0,
-            max = 45
+            max = maxHeadShape
         },
         skinFirst = {
             min = 0,
-            max = 45
+            max = maxHeadShape
         },
         skinSecond = {
             min = 0,
-            max = 45
+            max = maxHeadShape
         },
         skinThird = {
             min = 0,
-            max = 45
+            max = maxHeadShape
         },
         shapeMix = {
             min = 0,
