@@ -34,7 +34,7 @@ Config.EnablePedsForClothingRooms = true
 Config.EnablePedsForPlayerOutfitRooms = true
 
 Config.EnablePedMenu = true
-Config.PedMenuGroup = "group.admin"
+Config.PedMenuGroup = false
 
 Config.EnableJobOutfitsCommand = false -- Enables /joboutfits and /gangoutfits commands
 
