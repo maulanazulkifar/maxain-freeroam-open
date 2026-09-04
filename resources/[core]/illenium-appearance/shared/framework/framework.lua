@@ -5,7 +5,7 @@ function Framework.ESX()
 end
 
 function Framework.QBCore()
-    return GetResourceState("fpx_core") ~= "missing"
+    return GetResourceState("qb-core") ~= "missing"
 end
 
 function Framework.Ox()
