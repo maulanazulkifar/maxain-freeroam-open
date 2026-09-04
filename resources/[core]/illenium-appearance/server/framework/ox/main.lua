@@ -3,27 +3,7 @@ if not Framework.Ox() then return end
 local Ox = require '@ox_core.lib.init'
 
 function Framework.GetPlayerID(playerId)
-    if not playerId or playerId == 0 then return nil end
-    local player = Ox.GetPlayer(playerId)
-    if player and player.charId then
-        return player.charId
-    end
-
-    local srcStr = tostring(playerId)
-    if GetPlayerIdentifierByType then
-        local license = GetPlayerIdentifierByType(srcStr, 'license')
-        if license then return license end
-    end
-
-    local ids = GetPlayerIdentifiers(srcStr)
-    if ids and #ids > 0 then
-        for _, id in ipairs(ids) do
-            if id:sub(1, 8) == "license:" then return id end
-        end
-        return ids[1]
-    end
-
-    return srcStr
+    return Ox.GetPlayer(playerId).charId
 end
 
 function Framework.HasMoney(playerId, item, amount)

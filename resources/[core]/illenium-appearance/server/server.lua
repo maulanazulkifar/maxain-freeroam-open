@@ -17,10 +17,8 @@ local function getMoneyForShop(shopType)
 end
 
 local function getOutfitsForPlayer(citizenid)
-    if not citizenid then return end
     outfitCache[citizenid] = {}
     local result = Database.PlayerOutfits.GetAllByCitizenID(citizenid)
-    if not result then return end
     for i = 1, #result, 1 do
         outfitCache[citizenid][#outfitCache[citizenid] + 1] = {
             id = result[i].id,
@@ -129,11 +127,10 @@ end)
 
 lib.callback.register("illenium-appearance:server:getOutfits", function(source)
     local citizenID = Framework.GetPlayerID(source)
-    if not citizenID then return {} end
     if outfitCache[citizenID] == nil then
         getOutfitsForPlayer(citizenID)
     end
-    return outfitCache[citizenID] or {}
+    return outfitCache[citizenID]
 end)
 
 lib.callback.register("illenium-appearance:server:getManagementOutfits", function(source, mType, gender)
@@ -162,9 +159,7 @@ lib.callback.register("illenium-appearance:server:getManagementOutfits", functio
 end)
 
 lib.callback.register("illenium-appearance:server:getUniform", function(source)
-    local citizenID = Framework.GetPlayerID(source)
-    if not citizenID then return nil end
-    return uniformCache[citizenID]
+    return uniformCache[Framework.GetPlayerID(source)]
 end)
 
 RegisterServerEvent("illenium-appearance:server:saveAppearance", function(appearance)
@@ -271,25 +266,19 @@ end)
 
 RegisterNetEvent("illenium-appearance:server:syncUniform", function(uniform)
     local src = source
-    local citizenID = Framework.GetPlayerID(src)
-    if citizenID then
-        uniformCache[citizenID] = uniform
-    end
+    uniformCache[Framework.GetPlayerID(src)] = uniform
 end)
 
 RegisterNetEvent("illenium-appearance:server:deleteOutfit", function(id)
     local src = source
     local citizenID = Framework.GetPlayerID(src)
-    if not citizenID then return end
     Database.PlayerOutfitCodes.DeleteByOutfitID(id)
     Database.PlayerOutfits.DeleteByID(id)
 
-    if outfitCache[citizenID] then
-        for k, v in ipairs(outfitCache[citizenID]) do
-            if v.id == id then
-                table.remove(outfitCache[citizenID], k)
-                break
-            end
+    for k, v in ipairs(outfitCache[citizenID]) do
+        if v.id == id then
+            table.remove(outfitCache[citizenID], k)
+            break
         end
     end
 end)
@@ -313,7 +302,7 @@ RegisterNetEvent("illenium-appearance:server:ResetRoutingBucket", function()
 end)
 
 if Config.EnablePedMenu then
-    lib.addCommand("pedmenu", {
+    lib.addCommand("skin", {
         help = _L("commands.pedmenu.title"),
         params = {
             {
@@ -323,7 +312,7 @@ if Config.EnablePedMenu then
                 optional = true
             },
         },
-        restricted = Config.PedMenuGroup
+        --restricted = Config.PedMenuGroup
     }, function(source, args)
         local target = source
         if args.playerID then

@@ -18,55 +18,49 @@ local function getRankInputValues(rankList)
 end
 
 local function setClientParams()
-    if not PlayerData then return end
-    client.job = PlayerData.job or { name = "unemployed", grade = { level = 0 } }
-    client.gang = PlayerData.gang or { name = "none", grade = { level = 0 } }
+    client.job = PlayerData.job
+    client.gang = PlayerData.gang
     client.citizenid = PlayerData.citizenid
 end
 
 function Framework.GetPlayerGender()
-    if PlayerData and PlayerData.charinfo and PlayerData.charinfo.gender == 1 then
+    if PlayerData.charinfo.gender == 1 then
         return "Female"
     end
     return "Male"
 end
 
 function Framework.UpdatePlayerData()
-    PlayerData = QBCore.Functions.GetPlayerData() or {}
+    PlayerData = QBCore.Functions.GetPlayerData()
     setClientParams()
 end
 
 function Framework.HasTracker()
-    local pd = QBCore.Functions.GetPlayerData()
-    return pd and pd.metadata and pd.metadata["tracker"] or false
+    return QBCore.Functions.GetPlayerData().metadata["tracker"]
 end
 
 function Framework.CheckPlayerMeta()
-    if not PlayerData or not PlayerData.metadata then return false end
     return PlayerData.metadata["isdead"] or PlayerData.metadata["inlaststand"] or PlayerData.metadata["ishandcuffed"]
 end
 
 function Framework.IsPlayerAllowed(citizenid)
-    if not PlayerData or not PlayerData.citizenid then return true end
     return citizenid == PlayerData.citizenid
 end
 
 function Framework.GetRankInputValues(type)
-    local jobName = (client.job and client.job.name) or "unemployed"
-    local gangName = (client.gang and client.gang.name) or "none"
-    local grades = (QBCore.Shared.Jobs[jobName] and QBCore.Shared.Jobs[jobName].grades) or {}
+    local grades = QBCore.Shared.Jobs[client.job.name].grades
     if type == "gang" then
-        grades = (QBCore.Shared.Gangs[gangName] and QBCore.Shared.Gangs[gangName].grades) or {}
+        grades = QBCore.Shared.Gangs[client.gang.name].grades
     end
     return getRankInputValues(grades)
 end
 
 function Framework.GetJobGrade()
-    return (client.job and client.job.grade and client.job.grade.level) or 0
+    return client.job.grade.level
 end
 
 function Framework.GetGangGrade()
-    return (client.gang and client.gang.grade and client.gang.grade.level) or 0
+    return client.gang.grade.level
 end
 
 RegisterNetEvent("QBCore:Client:OnJobUpdate", function(JobInfo)

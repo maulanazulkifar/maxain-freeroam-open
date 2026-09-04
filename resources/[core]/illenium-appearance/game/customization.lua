@@ -284,19 +284,19 @@ local function getAppearanceSettings()
         },
         shapeThird = {
             min = 0,
-            max = 46
+            max = 45
         },
         skinFirst = {
             min = 0,
-            max = 46
+            max = 45
         },
         skinSecond = {
             min = 0,
-            max = 46
+            max = 45
         },
         skinThird = {
             min = 0,
-            max = 46
+            max = 45
         },
         shapeMix = {
             min = 0,
