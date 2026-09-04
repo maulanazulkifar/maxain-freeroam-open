@@ -1,0 +1,1 @@
+QBCore.Shared.Items = {}

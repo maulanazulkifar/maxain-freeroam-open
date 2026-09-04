@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QBCore Freeroam Loading Screen</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="overlay"></div>
+
+    <div class="main-container">
+        <div class="header">
+            <div class="qb-badge">QBCORE FREEROAM</div>
+            <h1>MAXAIN STUDIO</h1>
+            <p class="subtitle">Welcome to the ultimate GTA V Freeroam experience.</p>
+        </div>
+
+        <div class="footer">
+            <div class="loading-box">
+                <div class="loading-bar">
+                    <div class="loading-progress" id="progress-bar"></div>
+                </div>
+                <div class="status-row">
+                    <span id="loading-status">Connecting to server...</span>
+                    <span id="progress-percent">0%</span>
+                </div>
+            </div>
+
+            <div class="tips-card">
+                <span class="tip-title">FREEROAM TIP:</span>
+                <span id="tip-text">Press F1 or M to open vehicle options and customization menus.</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

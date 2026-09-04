@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QBCore HUD</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="hud-container" class="hidden">
+        <!-- Player Status Bars -->
+        <div class="status-box">
+            <div class="status-bar health-bar">
+                <div class="bar-icon">❤️</div>
+                <div class="bar-fill" id="health-fill"></div>
+            </div>
+            <div class="status-bar armor-bar">
+                <div class="bar-icon">🛡️</div>
+                <div class="bar-fill" id="armor-fill"></div>
+            </div>
+            <div class="status-bar stamina-bar">
+                <div class="bar-icon">⚡</div>
+                <div class="bar-fill" id="stamina-fill"></div>
+            </div>
+        </div>
+
+        <!-- Vehicle Speedometer HUD -->
+        <div id="vehicle-hud" class="hidden">
+            <div class="speed-counter">
+                <span id="speed-value">0</span>
+                <span id="speed-unit" class="unit">KM/H</span>
+            </div>
+            <div class="veh-info">
+                <div class="info-badge">GEAR <span id="gear-value">N</span></div>
+                <div class="info-badge">FUEL <span id="fuel-value">100%</span></div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
