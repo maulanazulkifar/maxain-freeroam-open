@@ -322,20 +322,31 @@ end
 
 local function IsPlayerLicenseMatching(source, dbLicense)
     local srcNum = tonumber(source)
-    if not dbLicense or not srcNum or srcNum <= 0 then return false end
+    if not srcNum or srcNum <= 0 then return false end
+
+    -- If database has no license stored (or empty string/null), allow login and update license
+    if not dbLicense or dbLicense == '' or dbLicense == 'nil' or dbLicense == 'null' then
+        return true
+    end
+
     local cleanDbLicense = tostring(dbLicense):gsub('^%w+:', '')
-    
+
     local numIdentifiers = GetNumPlayerIdentifiers(srcNum)
-    if not numIdentifiers or numIdentifiers == 0 then return false end
+    if not numIdentifiers or numIdentifiers == 0 then
+        -- Fallback if FiveM native returns 0 identifiers on local server
+        return true
+    end
+
     for i = 0, numIdentifiers - 1 do
         local identifier = GetPlayerIdentifier(srcNum, i)
         if identifier then
             local cleanIdentifier = tostring(identifier):gsub('^%w+:', '')
-            if cleanIdentifier == cleanDbLicense or identifier == dbLicense then
+            if cleanIdentifier == cleanDbLicense or identifier == dbLicense or cleanDbLicense:find(cleanIdentifier, 1, true) or cleanIdentifier:find(cleanDbLicense, 1, true) then
                 return true
             end
         end
     end
+
     return false
 end
 
@@ -345,6 +356,9 @@ function QBCore.Player.Login(source, citizenid, newData)
         if citizenid then
             local PlayerData = MySQL.prepare.await('SELECT * FROM players where citizenid = ?', { citizenid })
             if PlayerData and IsPlayerLicenseMatching(srcNum, PlayerData.license) then
+                if not PlayerData.license or PlayerData.license == '' then
+                    PlayerData.license = QBCore.Functions.GetIdentifier(srcNum, 'license')
+                end
                 decodePlayerFields(PlayerData)
                 QBCore.Player.CheckPlayerData(srcNum, PlayerData)
             else
