@@ -323,14 +323,17 @@ end
 function QBCore.Player.Login(source, citizenid, newData)
     if source and source ~= '' then
         if citizenid then
-            local license    = QBCore.Functions.GetIdentifier(source, 'license')
+            local license = QBCore.Functions.GetIdentifier(source, 'license')
             local PlayerData = MySQL.prepare.await('SELECT * FROM players where citizenid = ?', { citizenid })
-            if PlayerData and license == PlayerData.license then
+            local playerLicense = PlayerData and PlayerData.license or nil
+            local matchLicense = license and playerLicense and (license == playerLicense or license:gsub('license:', '') == playerLicense:gsub('license:', ''))
+            if PlayerData and matchLicense then
                 decodePlayerFields(PlayerData)
                 QBCore.Player.CheckPlayerData(source, PlayerData)
             else
+                local playerName = GetPlayerName(source) or ("Player " .. tostring(source))
                 DropPlayer(source, Lang:t('info.exploit_dropped'))
-                TriggerEvent('qb-log:server:CreateLog', 'anticheat', 'Anti-Cheat', 'white', GetPlayerName(source) .. ' Has Been Dropped For Character Joining Exploit', false)
+                TriggerEvent('qb-log:server:CreateLog', 'anticheat', 'Anti-Cheat', 'white', playerName .. ' Has Been Dropped For Character Joining Exploit', false)
                 return false
             end
         else
