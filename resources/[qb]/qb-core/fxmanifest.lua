@@ -1,44 +1,49 @@
 fx_version 'cerulean'
 game 'gta5'
-
 lua54 'yes'
-
-author 'QBCore Framework (Freeroam)'
-description 'QBCore Framework - Lightweight Freeroam Edition'
+author 'Kakarot'
+description 'Core resource for the framework, contains all the core functionality and features'
 version '1.3.0'
 
 shared_scripts {
     'config.lua',
     'shared/locale.lua',
-    'locales/en.lua',
+    'locale/en.lua',
+    'locale/*.lua',
     'shared/main.lua',
-    'shared/player.lua',
-    'shared/vehicles.lua',
+    'shared/functions.lua',
     'shared/items.lua',
     'shared/jobs.lua',
-    'shared/gangs.lua'
+    'shared/vehicles.lua',
+    'shared/gangs.lua',
+    'shared/weapons.lua',
+    'shared/locations.lua'
 }
 
 client_scripts {
-    'client/main.lua',
     'client/functions.lua',
-    'client/events.lua',
     'client/loops.lua',
+    'client/events.lua',
     'client/drawtext.lua'
 }
 
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
-    'server/main.lua',
     'server/functions.lua',
     'server/player.lua',
     'server/events.lua',
     'server/commands.lua',
-    'server/exports.lua'
+    'server/exports.lua',
+    'server/debug.lua'
 }
 
-exports {
-    'GetCoreObject',
-    'GetFunctions',
-    'GetPlayerData'
+ui_page 'html/index.html'
+
+files {
+    'html/index.html',
+    'html/css/style.css',
+    'html/css/drawtext.css',
+    'html/js/*.js'
 }
+
+dependency 'oxmysql'
