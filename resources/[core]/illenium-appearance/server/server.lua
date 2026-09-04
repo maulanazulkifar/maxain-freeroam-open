@@ -17,8 +17,10 @@ local function getMoneyForShop(shopType)
 end
 
 local function getOutfitsForPlayer(citizenid)
+    if not citizenid then return end
     outfitCache[citizenid] = {}
     local result = Database.PlayerOutfits.GetAllByCitizenID(citizenid)
+    if not result then return end
     for i = 1, #result, 1 do
         outfitCache[citizenid][#outfitCache[citizenid] + 1] = {
             id = result[i].id,
@@ -127,10 +129,11 @@ end)
 
 lib.callback.register("illenium-appearance:server:getOutfits", function(source)
     local citizenID = Framework.GetPlayerID(source)
+    if not citizenID then return {} end
     if outfitCache[citizenID] == nil then
         getOutfitsForPlayer(citizenID)
     end
-    return outfitCache[citizenID]
+    return outfitCache[citizenID] or {}
 end)
 
 lib.callback.register("illenium-appearance:server:getManagementOutfits", function(source, mType, gender)
@@ -159,7 +162,9 @@ lib.callback.register("illenium-appearance:server:getManagementOutfits", functio
 end)
 
 lib.callback.register("illenium-appearance:server:getUniform", function(source)
-    return uniformCache[Framework.GetPlayerID(source)]
+    local citizenID = Framework.GetPlayerID(source)
+    if not citizenID then return nil end
+    return uniformCache[citizenID]
 end)
 
 RegisterServerEvent("illenium-appearance:server:saveAppearance", function(appearance)
@@ -266,19 +271,25 @@ end)
 
 RegisterNetEvent("illenium-appearance:server:syncUniform", function(uniform)
     local src = source
-    uniformCache[Framework.GetPlayerID(src)] = uniform
+    local citizenID = Framework.GetPlayerID(src)
+    if citizenID then
+        uniformCache[citizenID] = uniform
+    end
 end)
 
 RegisterNetEvent("illenium-appearance:server:deleteOutfit", function(id)
     local src = source
     local citizenID = Framework.GetPlayerID(src)
+    if not citizenID then return end
     Database.PlayerOutfitCodes.DeleteByOutfitID(id)
     Database.PlayerOutfits.DeleteByID(id)
 
-    for k, v in ipairs(outfitCache[citizenID]) do
-        if v.id == id then
-            table.remove(outfitCache[citizenID], k)
-            break
+    if outfitCache[citizenID] then
+        for k, v in ipairs(outfitCache[citizenID]) do
+            if v.id == id then
+                table.remove(outfitCache[citizenID], k)
+                break
+            end
         end
     end
 end)
