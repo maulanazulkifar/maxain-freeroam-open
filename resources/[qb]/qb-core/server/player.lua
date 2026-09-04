@@ -321,12 +321,14 @@ end
 -- ─────────────────────────── login / logout ─────────────────────────────────
 
 local function IsPlayerLicenseMatching(source, dbLicense)
-    if not dbLicense or not source then return false end
+    local srcNum = tonumber(source)
+    if not dbLicense or not srcNum or srcNum <= 0 then return false end
     local cleanDbLicense = tostring(dbLicense):gsub('^%w+:', '')
     
-    local numIdentifiers = GetNumPlayerIdentifiers(source)
+    local numIdentifiers = GetNumPlayerIdentifiers(srcNum)
+    if not numIdentifiers or numIdentifiers == 0 then return false end
     for i = 0, numIdentifiers - 1 do
-        local identifier = GetPlayerIdentifier(source, i)
+        local identifier = GetPlayerIdentifier(srcNum, i)
         if identifier then
             local cleanIdentifier = tostring(identifier):gsub('^%w+:', '')
             if cleanIdentifier == cleanDbLicense or identifier == dbLicense then
@@ -338,20 +340,21 @@ local function IsPlayerLicenseMatching(source, dbLicense)
 end
 
 function QBCore.Player.Login(source, citizenid, newData)
-    if source and source ~= '' then
+    local srcNum = tonumber(source)
+    if srcNum and srcNum > 0 then
         if citizenid then
             local PlayerData = MySQL.prepare.await('SELECT * FROM players where citizenid = ?', { citizenid })
-            if PlayerData and IsPlayerLicenseMatching(source, PlayerData.license) then
+            if PlayerData and IsPlayerLicenseMatching(srcNum, PlayerData.license) then
                 decodePlayerFields(PlayerData)
-                QBCore.Player.CheckPlayerData(source, PlayerData)
+                QBCore.Player.CheckPlayerData(srcNum, PlayerData)
             else
-                local playerName = GetPlayerName(source) or ("Player " .. tostring(source))
-                DropPlayer(source, Lang:t('info.exploit_dropped'))
+                local playerName = GetPlayerName(srcNum) or ("Player " .. tostring(srcNum))
+                DropPlayer(srcNum, Lang:t('info.exploit_dropped'))
                 TriggerEvent('qb-log:server:CreateLog', 'anticheat', 'Anti-Cheat', 'white', playerName .. ' Has Been Dropped For Character Joining Exploit', false)
                 return false
             end
         else
-            QBCore.Player.CheckPlayerData(source, newData)
+            QBCore.Player.CheckPlayerData(srcNum, newData)
         end
         return true
     else
@@ -565,19 +568,20 @@ local playertables = {
 }
 
 function QBCore.Player.DeleteCharacter(source, citizenid)
-    local result  = MySQL.scalar.await('SELECT license FROM players where citizenid = ?', { citizenid })
-    if IsPlayerLicenseMatching(source, result) then
+    local srcNum = tonumber(source)
+    local result = MySQL.scalar.await('SELECT license FROM players where citizenid = ?', { citizenid })
+    if srcNum and IsPlayerLicenseMatching(srcNum, result) then
         local query = 'DELETE FROM %s WHERE citizenid = ?'
         for i = 1, #playertables do
             pcall(MySQL.query.await, query:format(playertables[i].table), { citizenid })
         end
-        local playerName = GetPlayerName(source) or ("Player " .. tostring(source))
-        local license = QBCore.Functions.GetIdentifier(source, 'license') or result or "Unknown"
+        local playerName = GetPlayerName(srcNum) or ("Player " .. tostring(srcNum))
+        local license = QBCore.Functions.GetIdentifier(srcNum, 'license') or result or "Unknown"
         TriggerEvent('qb-log:server:CreateLog', 'joinleave', 'Character Deleted', 'red',
             '**' .. playerName .. '** ' .. license .. ' deleted **' .. citizenid .. '**..')
     else
         local playerName = GetPlayerName(source) or ("Player " .. tostring(source))
-        DropPlayer(source, Lang:t('info.exploit_dropped'))
+        if srcNum then DropPlayer(srcNum, Lang:t('info.exploit_dropped')) end
         TriggerEvent('qb-log:server:CreateLog', 'anticheat', 'Anti-Cheat', 'white', playerName .. ' Has Been Dropped For Character Deletion Exploit', true)
     end
 end
