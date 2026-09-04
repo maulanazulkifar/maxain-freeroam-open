@@ -188,34 +188,66 @@ end
 
 if not Config.useTarget then
     CreateThread(function()
-        for i = 1, #Config.locations do
-            local zone = CircleZone:Create(Config.locations[i], 3.0, {
-                name = 'bank_' .. i,
+        if CircleZone then
+            for i = 1, #Config.locations do
+                local zone = CircleZone:Create(Config.locations[i], 3.0, {
+                    name = 'bank_' .. i,
+                    debugPoly = false,
+                })
+                zones[#zones + 1] = zone
+            end
+
+            local combo = ComboZone:Create(zones, {
+                name = 'bank_combo',
                 debugPoly = false,
             })
-            zones[#zones + 1] = zone
-        end
 
-        local combo = ComboZone:Create(zones, {
-            name = 'bank_combo',
-            debugPoly = false,
-        })
+            combo:onPlayerInOut(function(isPointInside)
+                isPlayerInsideBankZone = isPointInside
+                if isPlayerInsideBankZone then
+                    exports['qb-core']:DrawText('Open Bank')
+                    CreateThread(function()
+                        while isPlayerInsideBankZone do
+                            Wait(0)
+                            if IsControlJustPressed(0, 38) then
+                                OpenBank()
+                            end
+                        end
+                    end)
+                else
+                    exports['qb-core']:HideText()
+                end
+            end)
+        else
+            while true do
+                local sleep = 1000
+                local ped = PlayerPedId()
+                local pos = GetEntityCoords(ped)
+                local inRange = false
 
-        combo:onPlayerInOut(function(isPointInside)
-            isPlayerInsideBankZone = isPointInside
-            if isPlayerInsideBankZone then
-                exports['qb-core']:DrawText('Open Bank')
-                CreateThread(function()
-                    while isPlayerInsideBankZone do
-                        Wait(0)
+                for i = 1, #Config.locations do
+                    local dist = #(pos - Config.locations[i])
+                    if dist < 3.0 then
+                        sleep = 0
+                        inRange = true
+                        if not isPlayerInsideBankZone then
+                            isPlayerInsideBankZone = true
+                            exports['qb-core']:DrawText('[E] Open Bank')
+                        end
                         if IsControlJustPressed(0, 38) then
                             OpenBank()
                         end
+                        break
                     end
-                end)
-            else
-                exports['qb-core']:HideText()
+                end
+
+                if not inRange and isPlayerInsideBankZone then
+                    isPlayerInsideBankZone = false
+                    exports['qb-core']:HideText()
+                end
+
+                Wait(sleep)
             end
-        end)
+        end
     end)
 end

@@ -16,11 +16,11 @@ RegisterNetEvent('_chat:messageEntered')
 AddEventHandler('chatMessage', function(author, ctype, text)
     local args = {text}
     if author ~= "" then table.insert(args, 1, author) end
-    local ctype = ctype ~= false and ctype or "normal"
+    local cssClass = type(ctype) == 'string' and ctype or "normal"
     SendNUIMessage({
         type = 'ON_MESSAGE',
         message = {
-            template = '<div class="chat-message ' .. ctype ..
+            template = '<div class="chat-message ' .. cssClass ..
                 '"><div class="chat-message-body"><strong>{0}:</strong> {1}</div></div>',
             args = {author, text}
         }
