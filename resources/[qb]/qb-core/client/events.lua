@@ -1,8 +1,37 @@
+CreateThread(function()
+    while not NetworkIsSessionStarted() do
+        Wait(100)
+    end
+    Wait(500)
+    TriggerServerEvent('QBCore:Server:PlayerJoined')
+end)
+
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     ShutdownLoadingScreenNui()
     LocalPlayer.state:set('isLoggedIn', true, false)
+
+    local ped = PlayerPedId()
+    local PlayerData = QBCore.Functions.GetPlayerData()
+
+    if PlayerData and PlayerData.position then
+        local pos = PlayerData.position
+        local x = tonumber(pos.x or pos[1]) or 294.2
+        local y = tonumber(pos.y or pos[2]) or -584.2
+        local z = tonumber(pos.z or pos[3]) or 43.2
+        local h = tonumber(pos.a or pos.h or pos[4]) or 69.0
+
+        SetEntityCoords(ped, x, y, z, false, false, false, false)
+        SetEntityHeading(ped, h)
+    end
+
+    DoScreenFadeOut(0)
+    FreezeEntityPosition(ped, true)
+    Wait(500)
+    FreezeEntityPosition(ped, false)
+    DoScreenFadeIn(1000)
+
     if not QBCore.Config.Server.PVP then return end
-    SetCanAttackFriendly(PlayerPedId(), true, false)
+    SetCanAttackFriendly(ped, true, false)
     NetworkSetFriendlyFireOption(true)
 end)
 

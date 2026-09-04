@@ -196,6 +196,28 @@ RegisterNetEvent('QBCore:Server:OnPlayerLoaded', function()
     TriggerClientEvent('QBCore:Client:OnPlayerLoaded', src)
 end)
 
+RegisterNetEvent('QBCore:Server:PlayerJoined', function()
+    local src = tonumber(source)
+    if not src or src <= 0 then return end
+    if QBCore.Players[src] then
+        TriggerClientEvent('QBCore:Client:OnPlayerLoaded', src)
+        return
+    end
+
+    local license = QBCore.Functions.GetIdentifier(src, 'license')
+    if not license or license == '' then
+        DropPlayer(src, 'No valid license identifier found.')
+        return
+    end
+
+    local result = MySQL.prepare.await('SELECT citizenid FROM players WHERE license = ? LIMIT 1', { license })
+    if result and result.citizenid then
+        QBCore.Player.Login(src, result.citizenid)
+    else
+        QBCore.Player.Login(src, false)
+    end
+end)
+
 -- Central server-side data change handler — re-fires legacy events for backward compat
 AddEventHandler('QBCore:Server:OnPlayerUpdated', function(src, key, val)
     if key == 'job' then
