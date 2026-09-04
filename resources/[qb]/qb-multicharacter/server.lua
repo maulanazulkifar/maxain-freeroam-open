@@ -6,6 +6,7 @@ local Countries = json.decode(LoadResourceFile(GetCurrentResourceName(), '/count
 -- Functions
 
 local function GiveStarterItems(source)
+    if GetResourceState('qb-inventory') ~= 'started' then return end
     local src = source
     local Player = exports['qb-core']:GetPlayer(src)
     for _, v in pairs(sharedStarterItems) do
@@ -28,10 +29,11 @@ local function GiveStarterItems(source)
 end
 
 local function loadHouseData(src)
+    if GetResourceState('qb-houses') ~= 'started' then return end
     local HouseGarages = {}
     local Houses = {}
-    local result = MySQL.query.await('SELECT * FROM houselocations', {})
-    if result[1] ~= nil then
+    local success, result = pcall(MySQL.query.await, 'SELECT * FROM houselocations', {})
+    if success and result and result[1] ~= nil then
         for _, v in pairs(result) do
             local owned = false
             if tonumber(v.owned) == 1 then
