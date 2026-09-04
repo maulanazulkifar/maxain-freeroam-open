@@ -1014,6 +1014,7 @@ RegisterNetEvent('qb-clothing:client:reloadOutfits', function(myOutfits)
     })
 end)
 RegisterNetEvent('qb-clothes:client:CreateFirstCharacter', function()
+    if GetResourceState('illenium-appearance') == 'started' then return end
     QBCore.Functions.GetPlayerData(function(pData)
         local skin = 'mp_m_freemode_01'
         openMenu({
