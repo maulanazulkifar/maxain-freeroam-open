@@ -999,6 +999,7 @@ RegisterNetEvent('QBCore:Client:UpdateObject', function()
 end)
 
 RegisterNetEvent('qb-clothing:client:openMenu', function()
+    if GetResourceState('illenium-appearance') == 'started' then return end
     customCamLocation = nil
     openMenu({
         { menu = 'character',   label = Lang:t('menu.features'),    selected = true },
@@ -1036,6 +1037,7 @@ RegisterNetEvent('qb-clothes:client:CreateFirstCharacter', function()
 end)
 
 RegisterNetEvent('qb-clothes:loadSkin', function(_, model, data)
+    if GetResourceState('illenium-appearance') == 'started' then return end
     model = model ~= nil and tonumber(model) or false
     Citizen.CreateThread(function()
         RequestModel(model)
@@ -1051,6 +1053,7 @@ RegisterNetEvent('qb-clothes:loadSkin', function(_, model, data)
 end)
 
 RegisterNetEvent('qb-clothing:client:loadPlayerClothing', function(data, ped)
+    if GetResourceState('illenium-appearance') == 'started' or not data or type(data) ~= 'table' or not data['face'] then return end
     if ped == nil then ped = PlayerPedId() end
 
     for i = 0, 11 do
