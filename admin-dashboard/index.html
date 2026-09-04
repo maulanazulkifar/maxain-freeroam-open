@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAXAIN ADMIN — FiveM Asset Manager</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Top Header -->
+    <header class="header">
+        <div class="brand">
+            <span class="brand-badge">MAXAIN</span>
+            <span class="brand-title">ADMIN PANEL</span>
+        </div>
+        <div class="header-status">
+            <div class="status-indicator" id="statusIndicator">
+                <span class="dot"></span>
+                <span id="statusText">CONNECTING...</span>
+            </div>
+            <div class="header-metric">
+                <span class="metric-label">PLAYERS:</span>
+                <span class="metric-value" id="playerCount">0/0</span>
+            </div>
+            <button class="btn btn-secondary" id="btnSettingsModal">API SETTINGS</button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <button class="nav-item active" data-tab="overview">
+                <span class="nav-code">[01]</span> OVERVIEW
+            </button>
+            <button class="nav-item" data-tab="peds">
+                <span class="nav-code">[02]</span> PED MANAGEMENT
+            </button>
+            <button class="nav-item" data-tab="vehicles">
+                <span class="nav-code">[03]</span> VEHICLE CATALOG
+            </button>
+            <button class="nav-item" data-tab="console">
+                <span class="nav-code">[04]</span> RCON CONSOLE
+            </button>
+        </nav>
+
+        <!-- Main Content View -->
+        <main class="content">
+            <!-- TAB 1: OVERVIEW -->
+            <section class="tab-content active" id="tab-overview">
+                <div class="section-title">SERVER OVERVIEW</div>
+                <div class="metrics-grid">
+                    <div class="card">
+                        <div class="card-label">SERVER NAME</div>
+                        <div class="card-value" id="serverName">—</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">GAME BUILD</div>
+                        <div class="card-value" id="gameBuild">3905</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">UPTIME</div>
+                        <div class="card-value" id="serverUptime">0s</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-label">API CONNECTION</div>
+                        <div class="card-value" id="apiStatus">DISCONNECTED</div>
+                    </div>
+                </div>
+
+                <div class="section-title" style="margin-top: 2rem;">QUICK ACTIONS</div>
+                <div class="actions-row">
+                    <button class="btn btn-outline" onclick="executeQuickCommand('restart illenium-appearance')">RELOAD ILLENIUM-APPEARANCE</button>
+                    <button class="btn btn-outline" onclick="executeQuickCommand('restart vstancer')">RESTART VSTANCER</button>
+                    <button class="btn btn-outline" onclick="executeQuickCommand('ensure qb-radialmenu')">ENSURE RADIALMENU</button>
+                    <button class="btn btn-outline" onclick="executeQuickCommand('refresh')">REFRESH RESOURCES</button>
+                </div>
+            </section>
+
+            <!-- TAB 2: PED MANAGEMENT -->
+            <section class="tab-content" id="tab-peds">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">PED MANAGEMENT</div>
+                        <div class="section-desc">Manage active peds in illenium-appearance shared list.</div>
+                    </div>
+                    <button class="btn btn-primary" id="btnSyncPeds">SYNC TO FIVEM SERVER</button>
+                </div>
+
+                <div class="add-ped-form">
+                    <input type="text" id="inputPedModel" class="input" placeholder="e.g. mp_m_freemode_01, a_c_cat_01">
+                    <button class="btn btn-secondary" id="btnAddPed">+ ADD PED</button>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>PED MODEL NAME</th>
+                                <th>CATEGORY / TYPE</th>
+                                <th>ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pedsTableBody">
+                            <!-- Populated dynamically via app.js -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TAB 3: VEHICLE CATALOG -->
+            <section class="tab-content" id="tab-vehicles">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">VEHICLE CATALOG MANAGEMENT</div>
+                        <div class="section-desc">Add and manage vehicle spawn names, prices, and categories.</div>
+                    </div>
+                </div>
+
+                <div class="add-vehicle-grid">
+                    <input type="text" id="vehSpawnName" class="input" placeholder="Spawn Name (e.g. elegy)">
+                    <input type="text" id="vehLabel" class="input" placeholder="Display Label (e.g. Annis Elegy RH8)">
+                    <input type="text" id="vehCategory" class="input" placeholder="Category (e.g. Drift, JDM)">
+                    <input type="number" id="vehPrice" class="input" placeholder="Price ($)">
+                    <button class="btn btn-secondary" id="btnAddVehicle">+ ADD VEHICLE</button>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>SPAWN NAME</th>
+                                <th>DISPLAY LABEL</th>
+                                <th>CATEGORY</th>
+                                <th>PRICE</th>
+                            </tr>
+                        </thead>
+                        <tbody id="vehTableBody">
+                            <!-- Populated dynamically via app.js -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TAB 4: RCON CONSOLE -->
+            <section class="tab-content" id="tab-console">
+                <div class="section-title">REMOTE COMMAND CONSOLE</div>
+                <div class="console-box">
+                    <div class="console-output" id="consoleOutput">
+                        <div>[SYSTEM] Maxain Web Console Ready.</div>
+                        <div>[SYSTEM] Type any server command below (e.g. 'refresh', 'restart vstancer', 'ensure qb-hud').</div>
+                    </div>
+                    <form id="consoleForm" class="console-input-row">
+                        <span class="console-prompt">&gt;</span>
+                        <input type="text" id="consoleInput" class="console-input" placeholder="Enter console command...">
+                        <button type="submit" class="btn btn-primary">EXECUTE</button>
+                    </form>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- API Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal">
+            <div class="modal-title">API CONNECTION SETTINGS</div>
+            <div class="form-group">
+                <label class="label">FiveM Server API Host URL:</label>
+                <input type="text" id="cfgHostUrl" class="input" value="http://127.0.0.1:30120">
+            </div>
+            <div class="form-group">
+                <label class="label">API Secret Key (Bearer Token):</label>
+                <input type="password" id="cfgApiKey" class="input" value="maxain_secret_api_key_2026">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="btnCloseModal">CANCEL</button>
+                <button class="btn btn-primary" id="btnSaveSettings">SAVE &amp; CONNECT</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
